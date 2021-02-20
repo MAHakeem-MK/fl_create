@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:fl_create/project/presentation/widgets/create_button.dart';
 import 'package:fl_create/project/presentation/widgets/project_detail_field.dart';
+import 'package:fl_create/templates/main_template.dart';
+import 'package:fl_create/templates/pubspec_template.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -52,10 +54,21 @@ class CreateProjectPage extends StatelessWidget {
                         String path = "";
                         await getDownloadsDirectory()
                             .then((value) => path = value!.path);
+                        await Directory('$path/${_appNameController.text}')
+                            .create(recursive: true);
+                        await File(
+                                '$path/${_appNameController.text}/pubspec.yaml')
+                            .writeAsString(getPubspec(_appNameController.text));
+                        await Directory('$path/${_appNameController.text}/lib')
+                            .create(recursive: true);
+                        await File(
+                                '$path/${_appNameController.text}/lib/main.dart')
+                            .writeAsString(getMain());
+
                         await Process.run(
                           "flutter",
-                          ['create', _appNameController.text],
-                          workingDirectory: path,
+                          ['create', '.'],
+                          workingDirectory: '$path/${_appNameController.text}',
                         );
                       },
                     ),
